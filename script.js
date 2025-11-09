@@ -126,10 +126,11 @@ function checkSelection() {
   selected = [];
 
   if (solvedGroups.size === new Set(tiles.map(t => t.group)).size) {
-    statusEl.textContent = "🎉 You solved all groups!";
-  }
+  statusEl.textContent = "Congratulations, you solved the puzzle!";
+  showRoomModal();
+}
 }
 
-// 🚀 Start it up
+// Start it up
 loadPuzzle();
 
