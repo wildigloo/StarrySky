@@ -52,7 +52,7 @@ function buildPuzzle(puzzle) {
           type,
           value,
           group: groupName,
-          id: crypto.randomUUID()
+          id: self.crypto?.randomUUID ? self.crypto.randomUUID() : Math.random().toString(36).substring(2, 15)
         });
       }
     });
