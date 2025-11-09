@@ -22,6 +22,7 @@ const statusEl = document.getElementById("status");
 let tiles = [];
 let selected = [];
 let solvedGroups = new Set();
+let groupExplanations = {}; // 🧠 store explanations here
 
 // 🧩 Load all group documents from Firestore
 async function loadPuzzle() {
@@ -39,10 +40,18 @@ async function loadPuzzle() {
 // 🧱 Build puzzle grid
 function buildPuzzle(puzzle) {
   tiles = [];
+  groupExplanations = {};
 
-  // For each group (Group1, Group2, etc.)
   Object.entries(puzzle).forEach(([groupName, items]) => {
-    Object.values(items).forEach(value => {
+    const entries = Object.entries(items);
+    
+    entries.forEach(([key, value]) => {
+      if (key.toLowerCase() === "explanation") {
+        // Save explanation for that group
+        groupExplanations[groupName] = value;
+        return; // don’t add to puzzle grid
+      }
+
       const type = value.startsWith("http") ? "image" : "text";
       tiles.push({
         type,
@@ -53,13 +62,11 @@ function buildPuzzle(puzzle) {
     });
   });
 
-  // Shuffle the tiles randomly
+  // Shuffle tiles randomly
   tiles.sort(() => Math.random() - 0.5);
 
-  // Clear old grid
   puzzleContainer.innerHTML = "";
 
-  // Render tiles
   tiles.forEach(tile => {
     const div = document.createElement("div");
     div.classList.add("tile");
@@ -112,7 +119,7 @@ function showRoomModal() {
 
 // 🧩 Handle tile clicks
 function handleTileClick(tile, div) {
-  if (solvedGroups.has(tile.group)) return; // ignore solved groups
+  if (solvedGroups.has(tile.group)) return;
 
   if (selected.find(sel => sel.id === tile.id)) {
     div.classList.remove("selected");
@@ -135,14 +142,24 @@ function checkSelection() {
   const allSameGroup = selected.every(t => t.group === selected[0].group);
 
   if (allSameGroup) {
-    solvedGroups.add(selected[0].group);
+    const groupName = selected[0].group;
+    solvedGroups.add(groupName);
+
     selected.forEach(t => {
       const el = document.querySelector(`[data-id='${t.id}']`);
       el.classList.remove("selected");
       el.classList.add("correct");
       el.style.pointerEvents = "none";
     });
-    statusEl.textContent = `✅ Found group ${selected[0].group}`;
+
+    // 🎓 Show explanation if available
+    const explanation = groupExplanations[groupName];
+    if (explanation) {
+      statusEl.textContent = `💡 ${explanation}`;
+    } else {
+      statusEl.textContent = `✅ Found group ${groupName}`;
+    }
+
   } else {
     selected.forEach(t => {
       const el = document.querySelector(`[data-id='${t.id}']`);
@@ -154,9 +171,8 @@ function checkSelection() {
 
   selected = [];
 
-  // 🎯 Check if all groups are solved
   if (solvedGroups.size === new Set(tiles.map(t => t.group)).size) {
-    statusEl.textContent = "🎉 Congratulations, you solved the puzzle!";
+    statusEl.textContent = "🎉 You solved all groups!";
     showRoomModal();
   }
 }
