@@ -15,13 +15,121 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Example: Load puzzles
-async function loadPuzzles() {
-  const snapshot = await getDocs(collection(db, "puzzles"));
-  snapshot.forEach(doc => {
-    console.log(doc.id, " => ", doc.data());
+const puzzleContainer = document.getElementById("puzzle");
+const statusEl = document.getElementById("status");
+
+let tiles = [];
+let selected = [];
+let solvedGroups = new Set();
+
+// 🧩 Load all group documents from the TestPuzzle collection
+async function loadPuzzle() {
+  const groupsSnapshot = await getDocs(collection(db, "TestPuzzle"));
+  const puzzleData = {};
+
+  groupsSnapshot.forEach(groupDoc => {
+    puzzleData[groupDoc.id] = groupDoc.data();
+  });
+
+  console.log("Loaded puzzle:", puzzleData);
+  buildPuzzle(puzzleData);
+}
+
+// 🧱 Build puzzle grid
+function buildPuzzle(puzzle) {
+  tiles = [];
+
+  // For each group (Group1, Group2, etc.)
+  Object.entries(puzzle).forEach(([groupName, items]) => {
+    // Each group document has 4 fields: A, B, C, D
+    Object.values(items).forEach(value => {
+      const type = value.startsWith("http") ? "image" : "text";
+      tiles.push({
+        type,
+        value,
+        group: groupName,
+        id: crypto.randomUUID()
+      });
+    });
+  });
+
+  // Shuffle the tiles
+  tiles.sort(() => Math.random() - 0.5);
+
+  // Clear old grid
+  puzzleContainer.innerHTML = "";
+
+  // Render tiles
+  tiles.forEach(tile => {
+    const div = document.createElement("div");
+    div.classList.add("tile");
+    div.dataset.group = tile.group;
+    div.dataset.id = tile.id;
+
+    if (tile.type === "image") {
+      const img = document.createElement("img");
+      img.src = tile.value;
+      img.style.width = "100%";
+      img.style.borderRadius = "8px";
+      div.appendChild(img);
+    } else {
+      div.textContent = tile.value;
+    }
+
+    div.addEventListener("click", () => handleTileClick(tile, div));
+    puzzleContainer.appendChild(div);
   });
 }
 
-loadPuzzles();
+// 🧩 Handle tile clicks
+function handleTileClick(tile, div) {
+  if (solvedGroups.has(tile.group)) return; // ignore solved groups
+
+  if (selected.find(sel => sel.id === tile.id)) {
+    div.classList.remove("selected");
+    selected = selected.filter(sel => sel.id !== tile.id);
+    return;
+  }
+
+  if (selected.length < 4) {
+    selected.push(tile);
+    div.classList.add("selected");
+  }
+
+  if (selected.length === 4) {
+    checkSelection();
+  }
+}
+
+// ✅ Check if selection is correct
+function checkSelection() {
+  const allSameGroup = selected.every(t => t.group === selected[0].group);
+
+  if (allSameGroup) {
+    solvedGroups.add(selected[0].group);
+    selected.forEach(t => {
+      const el = document.querySelector(`[data-id='${t.id}']`);
+      el.classList.remove("selected");
+      el.classList.add("correct");
+      el.style.pointerEvents = "none";
+    });
+    statusEl.textContent = `✅ Found group ${selected[0].group}`;
+  } else {
+    selected.forEach(t => {
+      const el = document.querySelector(`[data-id='${t.id}']`);
+      el.classList.add("wrong");
+      setTimeout(() => el.classList.remove("wrong", "selected"), 500);
+    });
+    statusEl.textContent = "❌ Not a match!";
+  }
+
+  selected = [];
+
+  if (solvedGroups.size === new Set(tiles.map(t => t.group)).size) {
+    statusEl.textContent = "🎉 You solved all groups!";
+  }
+}
+
+// 🚀 Start it up
+loadPuzzle();
 
