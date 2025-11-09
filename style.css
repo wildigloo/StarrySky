@@ -59,6 +59,17 @@ body {
   align-items: center;
 }
 
+.explanation {
+  grid-column: 1 / -1;
+  background: #2e7d32;
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
 .modal-content {
   background: white;
   padding: 20px 30px;
