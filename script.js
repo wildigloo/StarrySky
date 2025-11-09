@@ -44,29 +44,37 @@ function buildPuzzle(puzzle) {
 
   Object.entries(puzzle).forEach(([groupName, items]) => {
     const entries = Object.entries(items);
-    
+
     entries.forEach(([key, value]) => {
-      if (key.toLowerCase() === "explanation") {
-        // Save explanation for that group
+      // Normalize field name
+      const fieldName = key.trim().toLowerCase();
+
+      // 🧠 Check if it's the explanation field
+      if (fieldName === "explanation" || fieldName === "info" || fieldName === "desc") {
         groupExplanations[groupName] = value;
-        return; // don’t add to puzzle grid
+        return; // Skip adding to grid
       }
 
-      const type = value.startsWith("http") ? "image" : "text";
-      tiles.push({
-        type,
-        value,
-        group: groupName,
-        id: crypto.randomUUID()
-      });
+      // 🧩 Only add A, B, C, D (the four puzzle pieces)
+      if (value && typeof value === "string") {
+        const type = value.startsWith("http") ? "image" : "text";
+        tiles.push({
+          type,
+          value,
+          group: groupName,
+          id: crypto.randomUUID()
+        });
+      }
     });
   });
 
-  // Shuffle tiles randomly
+  // Shuffle all tiles randomly
   tiles.sort(() => Math.random() - 0.5);
 
+  // Clear old grid
   puzzleContainer.innerHTML = "";
 
+  // Render tiles
   tiles.forEach(tile => {
     const div = document.createElement("div");
     div.classList.add("tile");
@@ -87,6 +95,7 @@ function buildPuzzle(puzzle) {
     puzzleContainer.appendChild(div);
   });
 }
+
 
 // 💬 Show room number modal
 function showRoomModal() {
