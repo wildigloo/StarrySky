@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc } 
+  from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB0RpSF2FGvGQLC0qGAR4vR7GaQKWFGKpE",
@@ -22,7 +23,7 @@ let tiles = [];
 let selected = [];
 let solvedGroups = new Set();
 
-// 🧩 Load all group documents from the TestPuzzle collection
+// 🧩 Load all group documents from Firestore
 async function loadPuzzle() {
   const groupsSnapshot = await getDocs(collection(db, "TestPuzzle"));
   const puzzleData = {};
@@ -41,7 +42,6 @@ function buildPuzzle(puzzle) {
 
   // For each group (Group1, Group2, etc.)
   Object.entries(puzzle).forEach(([groupName, items]) => {
-    // Each group document has 4 fields: A, B, C, D
     Object.values(items).forEach(value => {
       const type = value.startsWith("http") ? "image" : "text";
       tiles.push({
@@ -53,7 +53,7 @@ function buildPuzzle(puzzle) {
     });
   });
 
-  // Shuffle the tiles
+  // Shuffle the tiles randomly
   tiles.sort(() => Math.random() - 0.5);
 
   // Clear old grid
@@ -81,24 +81,30 @@ function buildPuzzle(puzzle) {
   });
 }
 
+// 💬 Show room number modal
 function showRoomModal() {
   const modal = document.getElementById("roomModal");
   modal.style.display = "flex";
 
   const submitBtn = document.getElementById("submitRoom");
-  submitBtn.onclick = () => {
+  submitBtn.onclick = async () => {
     const room = document.getElementById("roomInput").value.trim();
     if (!room) {
       alert("Please enter a room number!");
       return;
     }
 
-    // Option 1: Just log locally
-    console.log("Room number submitted:", room);
-    alert(`✅ Thanks! Room ${room} has been recorded.`);
+    try {
+      await addDoc(collection(db, "CompletedRooms"), {
+        room,
+        timestamp: new Date()
+      });
 
-    // Option 2 (later): Save to Firestore
-    // addDoc(collection(db, "CompletedRooms"), { room, timestamp: new Date() });
+      alert(`✅ Thanks! Room ${room} has been recorded.`);
+    } catch (err) {
+      console.error("Error saving room:", err);
+      alert("⚠️ Could not save your room. Please try again.");
+    }
 
     modal.style.display = "none";
   };
@@ -148,12 +154,12 @@ function checkSelection() {
 
   selected = [];
 
+  // 🎯 Check if all groups are solved
   if (solvedGroups.size === new Set(tiles.map(t => t.group)).size) {
-  statusEl.textContent = "Congratulations, you solved the puzzle!";
-  showRoomModal();
-}
+    statusEl.textContent = "🎉 Congratulations, you solved the puzzle!";
+    showRoomModal();
+  }
 }
 
-// Start it up
+// 🚀 Start it up
 loadPuzzle();
-
