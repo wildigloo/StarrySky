@@ -81,6 +81,29 @@ function buildPuzzle(puzzle) {
   });
 }
 
+function showRoomModal() {
+  const modal = document.getElementById("roomModal");
+  modal.style.display = "flex";
+
+  const submitBtn = document.getElementById("submitRoom");
+  submitBtn.onclick = () => {
+    const room = document.getElementById("roomInput").value.trim();
+    if (!room) {
+      alert("Please enter a room number!");
+      return;
+    }
+
+    // Option 1: Just log locally
+    console.log("Room number submitted:", room);
+    alert(`✅ Thanks! Room ${room} has been recorded.`);
+
+    // Option 2 (later): Save to Firestore
+    // addDoc(collection(db, "CompletedRooms"), { room, timestamp: new Date() });
+
+    modal.style.display = "none";
+  };
+}
+
 // 🧩 Handle tile clicks
 function handleTileClick(tile, div) {
   if (solvedGroups.has(tile.group)) return; // ignore solved groups
