@@ -1,6 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc } 
-  from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB0RpSF2FGvGQLC0qGAR4vR7GaQKWFGKpE",
@@ -17,14 +16,13 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const puzzleContainer = document.getElementById("puzzle");
-const statusEl = document.getElementById("status");
 
 let tiles = [];
 let selected = [];
 let solvedGroups = new Set();
-let groupExplanations = {}; // 🧠 store explanations here
+let explanations = {}; // store explanations separately
 
-// 🧩 Load all group documents from Firestore
+// 🧩 Load all group documents from the TestPuzzle collection
 async function loadPuzzle() {
   const groupsSnapshot = await getDocs(collection(db, "TestPuzzle"));
   const puzzleData = {};
@@ -40,23 +38,15 @@ async function loadPuzzle() {
 // 🧱 Build puzzle grid
 function buildPuzzle(puzzle) {
   tiles = [];
-  groupExplanations = {};
 
-  Object.entries(puzzle).forEach(([groupName, items]) => {
-    const entries = Object.entries(items);
+  Object.entries(puzzle).forEach(([groupName, fields]) => {
+    // save explanation
+    explanations[groupName] = fields.Explanation;
 
-    entries.forEach(([key, value]) => {
-      // Normalize field name
-      const fieldName = key.trim().toLowerCase();
-
-      // 🧠 Check if it's the explanation field
-      if (fieldName === "explanation" || fieldName === "info" || fieldName === "desc") {
-        groupExplanations[groupName] = value;
-        return; // Skip adding to grid
-      }
-
-      // 🧩 Only add A, B, C, D (the four puzzle pieces)
-      if (value && typeof value === "string") {
+    // only take A, B, C, D as puzzle tiles
+    ["A", "B", "C", "D"].forEach(key => {
+      const value = fields[key];
+      if (value) {
         const type = value.startsWith("http") ? "image" : "text";
         tiles.push({
           type,
@@ -68,13 +58,13 @@ function buildPuzzle(puzzle) {
     });
   });
 
-  // Shuffle all tiles randomly
+  // shuffle tiles
   tiles.sort(() => Math.random() - 0.5);
 
-  // Clear old grid
+  // clear old grid
   puzzleContainer.innerHTML = "";
 
-  // Render tiles
+  // render tiles
   tiles.forEach(tile => {
     const div = document.createElement("div");
     div.classList.add("tile");
@@ -96,8 +86,7 @@ function buildPuzzle(puzzle) {
   });
 }
 
-
-// 💬 Show room number modal
+// 💬 Show room modal
 function showRoomModal() {
   const modal = document.getElementById("roomModal");
   modal.style.display = "flex";
@@ -115,7 +104,6 @@ function showRoomModal() {
         room,
         timestamp: new Date()
       });
-
       alert(`✅ Thanks! Room ${room} has been recorded.`);
     } catch (err) {
       console.error("Error saving room:", err);
@@ -151,8 +139,8 @@ function checkSelection() {
   const allSameGroup = selected.every(t => t.group === selected[0].group);
 
   if (allSameGroup) {
-    const groupName = selected[0].group;
-    solvedGroups.add(groupName);
+    const group = selected[0].group;
+    solvedGroups.add(group);
 
     selected.forEach(t => {
       const el = document.querySelector(`[data-id='${t.id}']`);
@@ -161,13 +149,12 @@ function checkSelection() {
       el.style.pointerEvents = "none";
     });
 
-    // 🎓 Show explanation if available
-    const explanation = groupExplanations[groupName];
-    if (explanation) {
-      statusEl.textContent = `💡 ${explanation}`;
-    } else {
-      statusEl.textContent = `✅ Found group ${groupName}`;
-    }
+    // 💡 Show explanation text for the solved group
+    const explanationText = explanations[group] || `✅ Found ${group}!`;
+    const explanationEl = document.createElement("div");
+    explanationEl.classList.add("explanation");
+    explanationEl.textContent = explanationText;
+    puzzleContainer.prepend(explanationEl);
 
   } else {
     selected.forEach(t => {
@@ -175,16 +162,15 @@ function checkSelection() {
       el.classList.add("wrong");
       setTimeout(() => el.classList.remove("wrong", "selected"), 500);
     });
-    statusEl.textContent = "❌ Not a match!";
   }
 
   selected = [];
 
+  // 🎉 Puzzle complete
   if (solvedGroups.size === new Set(tiles.map(t => t.group)).size) {
-    statusEl.textContent = "🎉 You solved all groups!";
     showRoomModal();
   }
 }
 
-// 🚀 Start it up
+// 🚀 Start
 loadPuzzle();
