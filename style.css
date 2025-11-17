@@ -1,6 +1,7 @@
 body {
   font-family: system-ui, sans-serif;
-  background: #f7f8fa;
+  background-color: #000;   /* pure black */
+  color: white;
   text-align: center;
   margin: 20px;
 }
