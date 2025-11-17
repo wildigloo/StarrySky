@@ -7,6 +7,7 @@ body {
 }
 
 .puzzle-grid {
+  background-color: #000;
   display: grid;
   grid-template-columns: repeat(4, 120px);
   gap: 10px;
