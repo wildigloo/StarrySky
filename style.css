@@ -20,14 +20,14 @@ body {
 /* Keyframes: rotate according to movement */
 @keyframes shoot {
   0% {
-    transform: translate(0, 0) rotate(36.87deg); /* atan(600/800) ≈ 36.87° */
+    transform: translate(0, 0) rotate(216.87deg); /* atan(600/800) ≈ 36.87° */
     opacity: 1;
   }
   80% {
     opacity: 1;
   }
   100% {
-    transform: translate(800px, 600px) rotate(36.87deg);
+    transform: translate(800px, 600px) rotate(216.87deg);
     opacity: 0;
   }
 }
