@@ -20,7 +20,7 @@ body {
 /* Shooting star keyframes */
 @keyframes shoot {
   0% {
-    transform: translateX(0) translateY(0) rotate(45deg);
+    transform: translateX(0) translateY(0);
     opacity: 1;
   }
   80% {
