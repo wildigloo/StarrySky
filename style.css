@@ -12,7 +12,7 @@ body {
   background: linear-gradient(to right, white, rgba(255,255,255,0)); /* horizontal gradient */
   top: 0;
   left: 0;
-  transform: rotate(36.87deg); /* matches movement angle */
+  transform: rotate(216.87deg); /* matches movement angle */
   animation: shoot 1.5s linear infinite;
   opacity: 0;
 }
