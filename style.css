@@ -7,12 +7,12 @@ body {
 /* Shooting star */
 .shooting-star {
   position: absolute;
-  width: 2px;
-  height: 100px;
-  background: linear-gradient(to bottom, white, rgba(255,255,255,0));
-  top: -100px;
+  width: 100px;  /* long along X-axis now */
+  height: 2px;   /* thin */
+  background: linear-gradient(to right, white, rgba(255,255,255,0)); /* horizontal gradient */
+  top: 0;
   left: 0;
-  /* remove initial rotation */
+  transform: rotate(36.87deg); /* matches movement angle */
   animation: shoot 1.5s linear infinite;
   opacity: 0;
 }
