@@ -10,24 +10,24 @@ body {
   width: 2px;
   height: 100px;
   background: linear-gradient(to bottom, white, rgba(255,255,255,0));
-  top: -100px;  /* start off-screen */
+  top: -100px;
   left: 0;
-  transform: rotate(45deg);
+  /* remove initial rotation */
   animation: shoot 1.5s linear infinite;
   opacity: 0;
 }
 
-/* Shooting star keyframes */
+/* Keyframes: rotate according to movement */
 @keyframes shoot {
   0% {
-    transform: translate(0, 0) rotate(135deg);
+    transform: translate(0, 0) rotate(36.87deg); /* atan(600/800) ≈ 36.87° */
     opacity: 1;
   }
   80% {
     opacity: 1;
   }
   100% {
-    transform: translate(800px, 600px) rotate(45deg);
+    transform: translate(800px, 600px) rotate(36.87deg);
     opacity: 0;
   }
 }
