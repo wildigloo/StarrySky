@@ -26,7 +26,8 @@ function createGlowPixels() {
     pixel.style.top = `${Math.random() * 100}vh`;
     pixel.style.opacity = Math.random() * 0.5 + 0.5;
     pixel.style.transform = `scale(${Math.random() * 1.5 + 0.5})`;
-
+    pixel.style.animationDuration = `${Math.random() * 4 + 2}s`;
+    
     document.body.appendChild(pixel);
   }
 }
