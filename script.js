@@ -15,6 +15,22 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+const PIXEL_COUNT = 40;
+
+function createGlowPixels() {
+  for (let i = 0; i < PIXEL_COUNT; i++) {
+    const pixel = document.createElement("div");
+    pixel.className = "glow-pixel";
+
+    pixel.style.left = `${Math.random() * 100}vw`;
+    pixel.style.top = `${Math.random() * 100}vh`;
+    pixel.style.opacity = Math.random() * 0.5 + 0.5;
+    pixel.style.transform = `scale(${Math.random() * 1.5 + 0.5})`;
+
+    document.body.appendChild(pixel);
+  }
+}
+
 const puzzleContainer = document.getElementById("puzzle");
 
 let tiles = [];
@@ -173,4 +189,5 @@ function checkSelection() {
 }
 
 // 🚀 Start
+createGlowPixels();
 loadPuzzle();
