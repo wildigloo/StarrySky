@@ -3,35 +3,21 @@ body {
   background-color: #000;   /* pure black */
   text-align: center;
   margin: 20px;
-}
-/* Shooting star */
-.shooting-star {
-  position: absolute;
-  width: 100px;  /* long along X-axis now */
-  height: 2px;   /* thin */
-  background: linear-gradient(to right, white, rgba(255,255,255,0)); /* horizontal gradient */
-  top: 0;
-  left: 0;
-  transform: rotate(216.87deg); /* matches movement angle */
-  animation: shoot 1.5s linear infinite;
-  opacity: 0;
+  overflow: hidden; /* keep glow pixels contained */
 }
 
-/* Keyframes: rotate according to movement */
-@keyframes shoot {
-  0% {
-    transform: translate(0, 0) rotate(216.87deg); /* atan(600/800) ≈ 36.87° */
-    opacity: 1;
-  }
-  80% {
-    opacity: 1;
-  }
-  100% {
-    transform: translate(800px, 600px) rotate(216.87deg);
-    opacity: 0;
-  }
+/* Glowing background pixels */
+.glow-pixel {
+  position: fixed;
+  width: 3px;
+  height: 3px;
+  background: white;
+  box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.9);
+  border-radius: 1px;
+  pointer-events: none;
 }
 
+/* Title */
 h1 {
   color: white;
   text-align: center;
@@ -39,6 +25,7 @@ h1 {
   text-shadow: 0 0 8px rgba(255,255,255,0.6);
 }
 
+/* Puzzle grid */
 .puzzle-grid {
   display: grid;
   grid-template-columns: repeat(4, 120px);
@@ -80,8 +67,9 @@ h1 {
   font-weight: bold;
 }
 
+/* Modal */
 .modal {
-  display: none; /* hidden by default */
+  display: none;
   position: fixed;
   z-index: 1000;
   left: 0;
