@@ -14,6 +14,11 @@ body {
   100% { opacity: 0.5; }
 }
 
+@keyframes moonGlow {
+  0%, 100% { box-shadow: 0 0 25px 10px rgba(255, 255, 200, 0.5); }
+  50%      { box-shadow: 0 0 35px 15px rgba(255, 255, 220, 0.6); }
+}
+
 /* Glowing background pixels */
 .glow-pixel {
   position: fixed;
@@ -25,6 +30,19 @@ body {
   pointer-events: none;
 
   animation: flicker linear infinite;
+}
+
+.moon {
+  position: fixed;
+  top: 40px;    /* distance from top */
+  left: 40px;   /* distance from left */
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle at 30% 30%, #fff, #ccc 70%, #888 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 25px 10px rgba(255, 255, 200, 0.5);
+  z-index: 0;  /* behind everything */
+  animation: moonGlow 4s ease-in-out infinite;
 }
 
 /* Title */
