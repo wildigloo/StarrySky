@@ -41,7 +41,7 @@ let explanations = {}; // store explanations separately
 
 // 🧩 Load all group documents from the TestPuzzle collection
 async function loadPuzzle() {
-  const groupsSnapshot = await getDocs(collection(db, "2-23-26"));
+  const groupsSnapshot = await getDocs(collection(db, "3-2-26"));
   const puzzleData = {};
 
   groupsSnapshot.forEach(groupDoc => {
