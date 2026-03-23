@@ -170,7 +170,17 @@ function checkSelection() {
     const explanationText = explanations[group] || `✅ Found ${group}!`;
     const explanationEl = document.createElement("div");
     explanationEl.classList.add("explanation");
-    explanationEl.textContent = explanationText;
+    
+    if (typeof explanationText === "string" && explanationText.startsWith("http")) {
+      const img = document.createElement("img");
+      img.src = explanationText;
+      img.style.maxWidth = "100%";
+      img.style.borderRadius = "8px";
+      explanationEl.appendChild(img);
+    } else {
+      explanationEl.textContent = explanationText;
+    }
+    
     puzzleContainer.prepend(explanationEl);
 
   } else {
