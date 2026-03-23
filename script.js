@@ -41,7 +41,7 @@ let explanations = {}; // store explanations separately
 
 // 🧩 Load all group documents from the TestPuzzle collection
 async function loadPuzzle() {
-  const groupsSnapshot = await getDocs(collection(db, "3-16-26"));
+  const groupsSnapshot = await getDocs(collection(db, "3-23-26"));
   const puzzleData = {};
 
   groupsSnapshot.forEach(groupDoc => {
@@ -112,7 +112,7 @@ function showRoomModal() {
   submitBtn.onclick = async () => {
     const room = document.getElementById("roomInput").value.trim();
     if (!room) {
-      alert("Please enter a room number!");
+      alert("Thank you for playing! Feel free to leave feedback below!");
       return;
     }
 
@@ -121,7 +121,7 @@ function showRoomModal() {
         room,
         timestamp: new Date()
       });
-      alert(`✅ Thanks! Room ${room} has been recorded.`);
+      alert(`✅ Thank you for your feedback!`);
     } catch (err) {
       console.error("Error saving room:", err);
       alert("⚠️ Could not save your room. Please try again.");
